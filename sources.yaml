@@ -1,0 +1,6 @@
+- name: jolokia-jvm-1.3.2.redhat-1-agent.jar
+  chksum: 1b996b9083f537917b307309b0e2f16d
+- name: openshift-activemq-plugin-1.0.0.Final-redhat-1.jar
+  chksum: 325fbbaff0f7dbea42203346d9c3bf98
+- name: jboss-dmr-1.2.2.Final-redhat-1.jar
+  chksum: 8df4cbf6f39c3bce21de16ad708084d5
