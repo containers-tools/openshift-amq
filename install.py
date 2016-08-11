@@ -14,11 +14,11 @@ from cct.module import Module
 class Install(Module):
 
     # XXX: _check_env_vars method
-    #       _ AMQ_HOME
+    #       _ AMQ_HOME (via environment)
 
     def launch(self):
         src = "/tmp/cct/cct-amq-openshift/launch"
-        dst = self.environment['AMQ_HOME']
+        dst = os.getenv('AMQ_HOME')
         for leaf in ['bin', 'conf']:
             s = os.path.join(src,leaf)
             for f in os.listdir(s):
