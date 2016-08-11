@@ -20,7 +20,7 @@ class Install(Module):
         s2i = "/usr/local/s2i"
         src = "/tmp/cct/cct-amq-openshift/s2i"
 
-        if not os.exists(s2i):
+        if not os.path.exists(s2i):
             os.makedirs(s2i)
 
         for f in os.listdir(src):
