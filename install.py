@@ -33,3 +33,9 @@ class Install(Module):
 
         for f in os.listdir(src):
             shutil.move(os.path.join(src,f), dst)
+
+    def run(self):
+        """
+        Set up the CCT run script
+        """
+        self._move("/tmp/cct/cct-jboss-common/cctrun.yaml", "/tmp")
