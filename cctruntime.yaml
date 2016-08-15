@@ -2,4 +2,4 @@
    description: CCT runtime script for openshift AMQ
    changes:
      - cct-amq-openshift.Run:
-        - run:
+        - run_amq:

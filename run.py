@@ -13,7 +13,7 @@ from cct.module import Module
 
 # XXX: odd to put a Run inside install.py
 class Run(Module):
-    def run(self):
+    def run_amq(self):
         self.logger.debug("CCT runtime script running!")
         # and now CCT will run the docker CMD, which is still the launch shell
         # script, but we can gradually move more code from that to here, and
