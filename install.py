@@ -38,4 +38,4 @@ class Install(Module):
         """
         Set up the CCT run script
         """
-        self._move("/tmp/cct/cct-jboss-common/cctrun.yaml", "/tmp")
+        self._move("/tmp/cct/cct-jboss-common/cctruntime.yaml", "/tmp")
