@@ -33,9 +33,3 @@ class Install(Module):
 
         for f in os.listdir(src):
             shutil.move(os.path.join(src,f), dst)
-
-    def setup_run(self):
-        """
-        Set up the CCT run script
-        """
-        shutil.move("/tmp/cct/cct-amq-openshift/cctruntime.yaml", "/tmp")

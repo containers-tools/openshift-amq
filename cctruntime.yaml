@@ -1,5 +1,0 @@
- - name: amq-openshift-cct
-   description: CCT runtime script for openshift AMQ
-   changes:
-     - cct-amq-openshift.Run:
-        - run_amq:
