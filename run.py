@@ -11,36 +11,41 @@ import shutil
 
 from cct.module import Module
 
-
 def sed(oldstr, newstr, fname):
     """
     Temporary implementation of something like sed(1), for use in
     converting shell script functionality into this module.
-
-    No regexp functionality yet, not needed for what has been converted
-    over.
     """
-    contents = open(fname,'r').read()
-    contents = contents.replace(oldstr,newstr)
-    with open(fname,'w') as fh:
-        fh.write(contents)
+    with open(fname) as f:
+        contents = f.read()
 
-# XXX: odd to put a Run inside install.py
+    if oldstr not in contents:
+        return
+
+    with open(fname,'w') as f:
+        contents = contents.replace(oldstr,newstr)
+        f.write(contents)
+
 class Run(Module):
-    def __init__(self):
-        amq_home = os.getenv("AMQ_HOME")
-        self.users_file = "{}/conf/users.properties".format(amq_home)
-        self.config_file = "{}/conf/activemq.xml".format(amq_home)
 
     def configure_authentication(self):
-        if "username" in os.environ and "password" in os.environ:
-            username = os.getenv("username")
-            password = os.getenv("password")
+        # XXX: belongs in __init__
+        amq_home = os.getenv("AMQ_HOME")
+        # XXX: we need to modify openshift-users.properties here, temporarily, because
+        # the existing/legacy shell scripts that run *afterwards* copy it over the
+        # eventual location (same for activemq.xml)
+        self.users_file = "{}/conf/openshift-users.properties".format(amq_home)
+        self.config_file = "{}/conf/openshift-activemq.xml".format(amq_home)
+
+        if "AMQ_USER" in os.environ and "AMQ_PASSWORD" in os.environ:
+            username = os.getenv("AMQ_USER")
+            password = os.getenv("AMQ_PASSWORD")
             sed("##### AUTHENTICATION #####", "{}={}".format(username,password), self.users_file)
             authentication="<jaasAuthenticationPlugin configuration=\"activemq\" />"
         else:
             authentication="<jaasAuthenticationPlugin configuration=\"activemq-guest\" />"
-    sed("##### AUTHENTICATION #####", authentication, self.config_file)
+
+        sed("<!-- ##### AUTHENTICATION ##### -->", authentication, self.config_file)
 
     def run_amq(self):
         self.logger.debug("CCT runtime script running!")
