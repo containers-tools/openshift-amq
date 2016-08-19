@@ -176,7 +176,6 @@ cp "${OPENSHIFT_CONFIG_FILE}" "${CONFIG_FILE}"
 cp "${OPENSHIFT_LOGIN_FILE}" "${LOGIN_FILE}"
 cp "${OPENSHIFT_USERS_FILE}" "${USERS_FILE}"
 
-configureAuthentication
 configureDestinations
 configureSSL
 configureStoreUsage
