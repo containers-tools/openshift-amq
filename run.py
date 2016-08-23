@@ -23,6 +23,12 @@ class Run(Module):
         self.config_file = "{}/conf/openshift-activemq.xml".format(amq_home)
         self.config = xml.dom.minidom.parse(self.config_file)
 
+        self.ssl_envs = { k: os.getenv(k, "") for k in [
+            "AMQ_KEYSTORE_TRUSTSTORE_DIR", "AMQ_KEYSTORE", "AMQ_TRUSTSTORE",
+            "AMQ_TRUSTSTORE_PASSWORD", "AMQ_KEYSTORE_PASSWORD"
+        ]}
+        self.ssl_enabled = all(self.ssl_envs.values())
+
     def teardown(self):
         with open(self.config_file, "w") as fh:
             self.config.writexml(fh)
@@ -44,12 +50,9 @@ class Run(Module):
         p.appendChild(e)
 
     def configure_SSL(self):
-        envs = { k: os.getenv(k) or "" for k in [
-            "AMQ_KEYSTORE_TRUSTSTORE_DIR", "AMQ_KEYSTORE", "AMQ_TRUSTSTORE",
-            "AMQ_TRUSTSTORE_PASSWORD", "AMQ_KEYSTORE_PASSWORD"
-        ]}
+        envs = self.ssl_envs
 
-        if all(envs.values()):
+        if self.ssl_enabled:
             keyStorePath = os.path.join(envs['AMQ_KEYSTORE_TRUSTSTORE_DIR'], envs['AMQ_KEYSTORE'])
             trustStorePath = os.path.join(envs['AMQ_KEYSTORE_TRUSTSTORE_DIR'], envs['AMQ_TRUSTSTORE'])
 
