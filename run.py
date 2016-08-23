@@ -42,3 +42,27 @@ class Run(Module):
 
         p = self.config.getElementsByTagName("plugins")[0]
         p.appendChild(e)
+
+    def configure_SSL(self):
+        envs = { k: os.getenv(k) or "" for k in [
+            "AMQ_KEYSTORE_TRUSTSTORE_DIR", "AMQ_KEYSTORE", "AMQ_TRUSTSTORE",
+            "AMQ_TRUSTSTORE_PASSWORD", "AMQ_KEYSTORE_PASSWORD"
+        ]}
+
+        if all(envs.values()):
+            keyStorePath = os.path.join(envs['AMQ_KEYSTORE_TRUSTSTORE_DIR'], envs['AMQ_KEYSTORE'])
+            trustStorePath = os.path.join(envs['AMQ_KEYSTORE_TRUSTSTORE_DIR'], envs['AMQ_TRUSTSTORE'])
+
+            e1 = self.config.createElement("sslContext")
+            e2 = self.config.createElement("sslContext")
+            e2.setAttribute("keyStore", "file:{}".format(keyStorePath))
+            e2.setAttribute("trustStore", "file:{}".format(trustStorePath))
+            e2.setAttribute("keyStorePassword", envs['AMQ_KEYSTORE_PASSWORD'])
+            e2.setAttribute("trustStorePassword", envs['AMQ_TRUSTSTORE_PASSWORD'])
+
+            p = self.config.getElementsByTagName("broker")[0]
+            e1.appendChild(e2)
+            p.appendChild(e1)
+
+        elif any(envs.values()):
+            self.logger.error("WARNING! Partial ssl configuration, the ssl context WILL NOT be configured.")

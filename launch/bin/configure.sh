@@ -177,7 +177,6 @@ cp "${OPENSHIFT_LOGIN_FILE}" "${LOGIN_FILE}"
 cp "${OPENSHIFT_USERS_FILE}" "${USERS_FILE}"
 
 configureDestinations
-configureSSL
 configureStoreUsage
 configureTransportOptions
 checkViewEndpointsPermission
