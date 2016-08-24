@@ -102,7 +102,7 @@ class Run(Module):
         maxFrameSize = os.getenv("AMQ_FRAME_SIZE", "104857600")
 
         # only partially evaluated here; proto and port expanded later
-        uri = "{{proto}}://0.0.0.0:{{port}}?maximumConnections={maxConnections}\&amp;wireFormat.maxFrameSize={maxFrameSize}".format(maxConnections=maxConnections, maxFrameSize=maxFrameSize)
+        uri = "{{proto}}://0.0.0.0:{{port}}?maximumConnections={maxConnections}&amp;wireFormat.maxFrameSize={maxFrameSize}".format(maxConnections=maxConnections, maxFrameSize=maxFrameSize)
 
         # port and protocol values for different transports
         data = {
