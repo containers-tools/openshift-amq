@@ -7,7 +7,9 @@ of the MIT license. See the LICENSE file for details.
 """
 
 import os
+import ssl
 import shutil
+import urllib2
 import xml.dom.minidom
 
 from cct.module import Module
@@ -159,3 +161,41 @@ class Run(Module):
             b = self.config.getElementsByTagName("broker")[0]
             ncs = b.getElementsByTagName("networkConnectors")[0]
             ncs.appendChild(nc)
+
+    def check_view_endpoints_permission(self):
+        if os.getenv("AMQ_MESH_DISCOVERY_TYPE", "") != "kube":
+            return
+
+        namespace = os.getenv("AMQ_MESH_SERVICE_NAMESPACE", "")
+        servicename = os.getenv("AMQ_MESH_SERVICE_NAME", "")
+
+        if not (namespace and servicename):
+            self.logger.error("WARNING: Environment variables AMQ_MESH_SERVICE_NAMESPACE and AMQ_MESH_SERVICE_NAME both need to be defined when using AMQ_MESH_DISCOVERY_TYPE=\"kube\". Mesh will be unavailable. Please refer to the documentation for configuration.")
+            return
+
+        url="https://{}:{}/api/v1/namespaces/{}/endpoints/{}".format(
+            os.getenv("KUBERNETES_SERVICE_HOST", "kubernetes.default.svc"),
+            os.getenv("KUBERNETES_SERVICE_PORT", "443"),
+            namespace, servicename
+        )
+        auth="Authorization: Bearer "
+        with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as fh:
+            auth += fh.read()
+
+        request = urllib2.Request(url)
+        request.add_header("Authorization", auth)
+
+        # this is faithful to the shell impl, but I'd like to look at checking certs as a TODO
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
+        result = urllib2.urlopen(request, context=ctx)
+        code=result.getcode()
+
+        if code == 200:
+            self.logger.info("Service account has sufficient permissions to view endpoints in kubernetes (HTTP {}). Mesh will be available.".format(code))
+        elif code == 403:
+            self.logger.warning("Service account has insufficient permissions to view endpoints in kubernetes (HTTP {}). Mesh will be unavailable. Please refer to the documentation for configuration.".format(code))
+        else:
+            self.logger.warning("Service account unable to test permissions to view endpoints in kubernetes (HTTP {}). Mesh will be unavailable. Please refer to the documentation for configuration.".format(code))
