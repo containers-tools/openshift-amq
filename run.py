@@ -71,7 +71,7 @@ class Run(Module):
             self.logger.error("WARNING! Partial ssl configuration, the ssl context WILL NOT be configured.")
 
     def configure_storeUsage(self):
-        su = os.getenv("AMQ_STORAGE_USAGE_LIMIT") or "100 gb"
+        su = os.getenv("AMQ_STORAGE_USAGE_LIMIT", "100 gb")
         for node in self.config.getElementsByTagName("storeUsage"):
             if node.attributes and node.getAttribute("limit"):
                 node.setAttribute("limit", su)
