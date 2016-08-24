@@ -75,3 +75,23 @@ class Run(Module):
         for node in self.config.getElementsByTagName("storeUsage"):
             if node.attributes and node.getAttribute("limit"):
                 node.setAttribute("limit", su)
+
+    def configure_destinations(self):
+        queues = os.getenv("AMQ_QUEUES", "").split(",")
+        topics = os.getenv("AMQ_TOPICS", "").split(",")
+
+        if len(queues) > 0 or len(topics) > 0:
+            d = self.config.createElement("destinations")
+
+            for queue in queues:
+                q = self.config.createElement("queue")
+                q.setAttribute("physicalName", queue)
+                d.appendChild(q)
+
+            for topic in topics:
+                t = self.config.createElement("topic")
+                t.setAttribute("physicalName", topic)
+                d.appendChild(t)
+
+            b = self.config.getElementsByTagName("broker")[0]
+            b.appendChild(d)

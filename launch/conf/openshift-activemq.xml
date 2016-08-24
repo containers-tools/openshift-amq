@@ -37,8 +37,6 @@
     -->
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="${HOSTNAME}" dataDirectory="${activemq.data}">
 
-        <!-- ##### DESTINATIONS ##### -->
-
         <destinationPolicy>
             <policyMap>
                 <policyEntries>

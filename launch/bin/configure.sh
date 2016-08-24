@@ -73,27 +73,6 @@ function configureAuthentication() {
   sed -i "s|<!-- ##### AUTHENTICATION ##### -->|${authentication}|" "$CONFIG_FILE"
 }
 
-function configureDestinations() {
-  IFS=',' read -a queues <<< ${AMQ_QUEUES}
-  IFS=',' read -a topics <<< ${AMQ_TOPICS}
-
-  if [ "${#queues[@]}" -ne "0" -o "${#topics[@]}" -ne "0" ]; then
-    destinations="<destinations>"
-    if [ "${#queues[@]}" -ne "0" ]; then
-      for queue in ${queues[@]}; do
-        destinations="${destinations}<queue physicalName=\"${queue}\"/>"
-      done
-    fi
-    if [ "${#topics[@]}" -ne "0" ]; then
-      for topic in ${topics[@]}; do
-        destinations="${destinations}<topic physicalName=\"${topic}\"/>"
-      done
-    fi
-    destinations="${destinations}</destinations>"
-    sed -i "s|<!-- ##### DESTINATIONS ##### -->|${destinations}|" "$CONFIG_FILE"
-  fi
-}
-
 function sslPartial() {
   [ -n "$AMQ_KEYSTORE_TRUSTSTORE_DIR" -o -n "$AMQ_KEYSTORE" -o -n "$AMQ_TRUSTSTORE" -o -n "$AMQ_KEYSTORE_PASSWORD" -o -n "$AMQ_TRUSTSTORE_PASSWORD" ]
 }
@@ -176,7 +155,6 @@ cp "${OPENSHIFT_CONFIG_FILE}" "${CONFIG_FILE}"
 cp "${OPENSHIFT_LOGIN_FILE}" "${LOGIN_FILE}"
 cp "${OPENSHIFT_USERS_FILE}" "${USERS_FILE}"
 
-configureDestinations
 configureTransportOptions
 checkViewEndpointsPermission
 configureMesh
