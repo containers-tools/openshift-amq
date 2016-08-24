@@ -138,3 +138,24 @@ class Run(Module):
 
             b = self.config.getElementsByTagName("broker")[0]
             b.appendChild(t)
+
+    def configure_mesh(self):
+        serviceName = os.getenv("AMQ_MESH_SERVICE_NAME", "")
+        username = os.getenv("AMQ_USER", "")
+        password = os.getenv("AMQ_PASSWORD", "")
+        discoveryType = os.getenv("AMQ_MESH_DISCOVERY_TYPE", "dns")
+
+        if serviceName:
+            nc = self.config.createElement("networkConnector")
+            nc.setAttribute("uri", "{}://{}:61616/?transportType=tcp".format(discoveryType,serviceName))
+            nc.setAttribute("messageTTL", "-1")
+            nc.setAttribute("consumerTTL", "1")
+
+            if username and password:
+                nc.setAttribute("userName", username)
+                nc.setAttribute("password", password)
+
+            # networkConnectors within broker
+            b = self.config.getElementsByTagName("broker")[0]
+            ncs = b.getElementsByTagName("networkConnectors")[0]
+            ncs.appendChild(nc)

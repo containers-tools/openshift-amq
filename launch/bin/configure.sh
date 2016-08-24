@@ -43,23 +43,6 @@ function checkViewEndpointsPermission() {
     fi
 }
 
-function configureMesh() {
-  serviceName="${AMQ_MESH_SERVICE_NAME}"
-  username="${AMQ_USER}"
-  password="${AMQ_PASSWORD}"
-  discoveryType="${AMQ_MESH_DISCOVERY_TYPE:-dns}"
-
-  if [ -n "${serviceName}" ] ; then
-    networkConnector=""
-    if [ -n "${username}" -a -n "${password}" ] ; then
-      networkConnector="<networkConnector userName=\"${username}\" password=\"${password}\" uri=\"${discoveryType}://${serviceName}:61616/?transportType=tcp\" messageTTL=\"-1\" consumerTTL=\"1\" />"
-    else
-      networkConnector="<networkConnector uri=\"${discoveryType}://${serviceName}:61616/?transportType=tcp\" messageTTL=\"-1\" consumerTTL=\"1\" />"
-    fi
-    sed -i "s|<!-- ##### MESH_CONFIG ##### -->|${networkConnector}|" "$CONFIG_FILE"
-  fi
-}
-
 function configureAuthentication() {
   username="${AMQ_USER}"
   password="${AMQ_PASSWORD}"
@@ -116,4 +99,3 @@ cp "${OPENSHIFT_LOGIN_FILE}" "${LOGIN_FILE}"
 cp "${OPENSHIFT_USERS_FILE}" "${USERS_FILE}"
 
 checkViewEndpointsPermission
-configureMesh
