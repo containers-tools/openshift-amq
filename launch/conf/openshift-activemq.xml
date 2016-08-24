@@ -112,7 +112,6 @@
         </persistenceAdapter>
 
         <plugins>
-            <!-- ##### AUTHENTICATION ##### -->
         </plugins>
 
         <!--
@@ -128,7 +127,7 @@
                     <memoryUsage percentOfJvmHeap="70" />
                 </memoryUsage>
                 <storeUsage>
-                    <storeUsage limit="##### STORE_USAGE #####" />
+                    <storeUsage limit="100 gb" />
                 </storeUsage>
                 <tempUsage>
                     <tempUsage limit="50 gb" />
@@ -142,8 +141,6 @@
 
             http://activemq.apache.org/configuring-transports.html
         -->
-
-        <!-- ##### SSL_CONTEXT ##### -->
 
         <!-- destroy the spring context on shutdown to stop jetty -->
         <shutdownHooks>
