@@ -143,7 +143,6 @@
 
             http://activemq.apache.org/configuring-transports.html
         -->
-        <!-- ##### TRANSPORT_CONNECTORS ##### -->
 
         <!-- ##### SSL_CONTEXT ##### -->
 

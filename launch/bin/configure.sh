@@ -111,50 +111,9 @@ function configureStoreUsage() {
   sed -i "s|##### STORE_USAGE #####|${storeUsage}|" "$CONFIG_FILE"
 }
 
-function configureTransportOptions() {
-  IFS=',' read -a transports <<< $(find_env "AMQ_TRANSPORTS" "openwire,mqtt,amqp,stomp")
-  maxConnections=$(find_env "AMQ_MAX_CONNECTIONS" "1000")
-  maxFrameSize=$(find_env "AMQ_FRAME_SIZE" "104857600")
-
-  if [ "${#transports[@]}" -ne "0" ]; then
-    transportConnectors="<transportConnectors>"
-    for transport in ${transports[@]}; do
-      case "${transport}" in
-        "openwire")
-          transportConnectors="${transportConnectors}\n            <transportConnector name=\"openwire\" uri=\"tcp://0.0.0.0:61616?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          if sslEnabled ; then
-            transportConnectors="${transportConnectors}\n            <transportConnector name=\"ssl\" uri=\"ssl://0.0.0.0:61617?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          fi
-          ;;
-        "mqtt")
-          transportConnectors="${transportConnectors}\n            <transportConnector name=\"mqtt\" uri=\"mqtt://0.0.0.0:1883?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          if sslEnabled ; then
-            transportConnectors="${transportConnectors}\n            <transportConnector name=\"mqtt+ssl\" uri=\"mqtt+ssl://0.0.0.0:8883?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          fi
-          ;;
-        "amqp")
-          transportConnectors="${transportConnectors}\n            <transportConnector name=\"amqp\" uri=\"amqp://0.0.0.0:5672?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          if sslEnabled ; then
-            transportConnectors="${transportConnectors}\n            <transportConnector name=\"amqp+ssl\" uri=\"amqp+ssl://0.0.0.0:5671?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          fi
-          ;;
-        "stomp")
-          transportConnectors="${transportConnectors}\n            <transportConnector name=\"stomp\" uri=\"stomp://0.0.0.0:61613?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          if sslEnabled ; then
-            transportConnectors="${transportConnectors}\n            <transportConnector name=\"stomp+ssl\" uri=\"stomp+ssl://0.0.0.0:61612?maximumConnections=${maxConnections}\&amp;wireFormat.maxFrameSize=${maxFrameSize}\" />"
-          fi
-          ;;
-      esac
-    done
-    transportConnectors="${transportConnectors}\n        </transportConnectors>"
-    sed -i "s|<!-- ##### TRANSPORT_CONNECTORS ##### -->|${transportConnectors}|" "$CONFIG_FILE"
-  fi
-}
-
 cp "${OPENSHIFT_CONFIG_FILE}" "${CONFIG_FILE}"
 cp "${OPENSHIFT_LOGIN_FILE}" "${LOGIN_FILE}"
 cp "${OPENSHIFT_USERS_FILE}" "${USERS_FILE}"
 
-configureTransportOptions
 checkViewEndpointsPermission
 configureMesh

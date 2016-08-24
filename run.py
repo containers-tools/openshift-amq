@@ -95,3 +95,46 @@ class Run(Module):
 
             b = self.config.getElementsByTagName("broker")[0]
             b.appendChild(d)
+
+    def configure_transport_options(self):
+        transports = os.getenv("AMQ_TRANSPORTS", "openwire,mqtt,amqp,stomp").split(",")
+        maxConnections = os.getenv("AMQ_MAX_CONNECTIONS", "1000")
+        maxFrameSize = os.getenv("AMQ_FRAME_SIZE", "104857600")
+
+        # only partially evaluated here; proto and port expanded later
+        uri = "{{proto}}://0.0.0.0:{{port}}?maximumConnections={maxConnections}\&amp;wireFormat.maxFrameSize={maxFrameSize}".format(maxConnections=maxConnections, maxFrameSize=maxFrameSize)
+
+        # port and protocol values for different transports
+        data = {
+            "openwire": [ "tcp",   "61616", "ssl",      "61617" ],
+            "mqtt":     [ "mqtt",  "1883",  "mqtt+ssl", "8883"  ],
+            "amqp":     [ "amqp",  "5672",  "amqp+ssl", "5671"  ],
+            "stomp":    [ "stomp", "61613", "stomp+ssl","61612" ],
+        }
+
+        if len(transports) > 0:
+            t = self.config.createElement("transportConnectors")
+
+            for transport in transports:
+                tc = self.config.createElement("transportConnector")
+                tc.setAttribute("name", transport)
+
+                if self.ssl_enabled:
+                    tc_ssl = self.config.createElement("transportConnector")
+                    tc_ssl.setAttribute("name","ssl")
+
+                if transport in data:
+                        proto,port,sslproto,sslport = data[transport]
+                        tc.setAttribute("uri", uri.format(proto=proto,port=port))
+                        if self.ssl_enabled:
+                            tc_ssl.setAttribute("uri", uri.format(proto=sslproto,port=sslport))
+                else:
+                    self.logger.error("Unknown transport type '{}'".format(transport))
+                    continue
+
+                t.appendChild(tc)
+                if self.ssl_enabled:
+                    t.appendChild(tc_ssl)
+
+            b = self.config.getElementsByTagName("broker")[0]
+            b.appendChild(t)
