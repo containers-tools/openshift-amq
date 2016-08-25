@@ -17,7 +17,7 @@ class Install(Module):
     #       _ AMQ_HOME (via environment)
 
     def launch(self):
-        src = "/tmp/cct/cct-amq-openshift/launch"
+        src = "/tmp/cct/openshift-amq/launch"
         dst = os.getenv('AMQ_HOME')
         for leaf in ['bin', 'conf']:
             s = os.path.join(src,leaf)
@@ -25,7 +25,7 @@ class Install(Module):
                 shutil.move(os.path.join(s,f), os.path.join(dst,leaf))
 
     def s2i(self):
-        src = "/tmp/cct/cct-amq-openshift/s2i"
+        src = "/tmp/cct/openshift-amq/s2i"
         dst = "/usr/local/s2i"
 
         if not os.path.exists(dst):
