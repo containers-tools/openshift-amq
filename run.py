@@ -35,6 +35,18 @@ class Run(Module):
         with open(self.config_file, "w") as fh:
             self.config.writexml(fh)
 
+    def configure(self):
+        """
+        Aggregate method that calls all configure_* methods in sequence.
+        """
+        self.configure_authentication()
+        self.configure_SSL()
+        self.configure_storeUsage()
+        self.configure_destinations()
+        self.configure_transport_options()
+        self.configure_mesh()
+        self.check_view_endpoints_permission()
+
     def configure_authentication(self):
         e = self.config.createElement("jaasAuthenticationPlugin")
 
